@@ -1,13 +1,13 @@
-package com.squad67.sistema_web_mvc;
+package com.exemplo.projeto_mvp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SistemaWebMvcApplication {
+public class ProjetoMvpApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SistemaWebMvcApplication.class, args);
+		SpringApplication.run(ProjetoMvpApplication.class, args);
 	}
 
 }
