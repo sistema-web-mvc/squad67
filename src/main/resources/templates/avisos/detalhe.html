@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${aviso.titulo()})}"></head>
+<body>
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header th:replace="~{fragments/layout :: cabecalho('avisos')}"></header>
+
+<main id="conteudo" class="container secao">
+
+    <p><a class="voltar" th:href="@{/avisos}">&larr; Voltar para os avisos</a></p>
+
+    <article class="detalhe">
+        <p class="detalhe__selos">
+            <span class="selo selo--tipo" th:text="${aviso.tipo().rotulo}">Tipo</span>
+            <span class="selo" th:if="${aviso.expirado()}">Expirado</span>
+        </p>
+
+        <h1 th:text="${aviso.titulo()}">Título do aviso</h1>
+
+        <p class="detalhe__descricao" th:if="${aviso.descricao() != null}" th:text="${aviso.descricao()}">
+            Descrição do aviso.
+        </p>
+        <p class="detalhe__descricao" th:if="${aviso.descricao() == null}">
+            Este aviso não tem descrição.
+        </p>
+
+        <dl class="dados">
+            <div>
+                <dt>Para</dt>
+                <dd th:text="${aviso.escopo()}">Turma</dd>
+            </div>
+            <div th:if="${aviso.espaco() != null}">
+                <dt>Local</dt>
+                <dd th:text="${aviso.espaco()}">Sala</dd>
+            </div>
+            <div>
+                <dt>Campus</dt>
+                <dd th:text="${aviso.campus()}">Campus</dd>
+            </div>
+            <div>
+                <dt>Publicado por</dt>
+                <dd th:text="${aviso.autor()}">Autor</dd>
+            </div>
+            <div>
+                <dt>Publicado em</dt>
+                <dd th:text="${aviso.criadoEmFormatado()}">01/01/2026 08:00</dd>
+            </div>
+            <div th:if="${aviso.expiraEm() != null}">
+                <dt>Vale até</dt>
+                <dd th:text="${aviso.expiraEmFormatado()}">01/01/2026 18:00</dd>
+            </div>
+            <div>
+                <dt>Confirmações</dt>
+                <dd th:text="${aviso.confirmacoes()}">0</dd>
+            </div>
+        </dl>
+    </article>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+</body>
+</html>

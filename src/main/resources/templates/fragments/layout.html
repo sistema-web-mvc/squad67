@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  Layout base do IF Agora. Cada página reaproveita estes pedaços:
+    <head th:replace="~{fragments/layout :: head('Título da página')}"></head>
+    <header th:replace="~{fragments/layout :: cabecalho('inicio')}"></header>
+    <footer th:replace="~{fragments/layout :: rodape}"></footer>
+-->
+
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title th:text="${titulo} + ' | IF Agora'">IF Agora</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- ativo: nome da página atual, usado para marcar o item do menu -->
+<header class="cabecalho" th:fragment="cabecalho(ativo)">
+    <div class="container cabecalho__interno">
+        <a class="marca" th:href="@{/}" aria-label="IF Agora, página inicial">
+            <span class="marca__icone" aria-hidden="true">IF</span>
+            <span class="marca__nome">Agora</span>
+        </a>
+
+        <nav aria-label="Menu principal">
+            <ul class="menu">
+                <li>
+                    <a th:href="@{/}"
+                       th:attr="aria-current=${ativo == 'inicio'} ? 'page' : null">Início</a>
+                </li>
+                <li>
+                    <a th:href="@{/avisos}"
+                       th:attr="aria-current=${ativo == 'avisos'} ? 'page' : null">Avisos</a>
+                </li>
+                <!-- Novas páginas entram aqui, copiando o item acima e trocando 'avisos' pelo nome da página. -->
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<footer class="rodape" th:fragment="rodape">
+    <div class="container rodape__interno">
+        <img class="rodape__logo" th:src="@{/img/logo-iftm-uberlandia-centro.png}"
+             alt="Instituto Federal do Triângulo Mineiro, Campus Uberlândia Centro">
+        <div>
+            <p>IF Agora · projeto da equipe Squad 67 · IFTM</p>
+            <p class="rodape__nota">Projeto acadêmico. Ainda não é um canal oficial do instituto.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

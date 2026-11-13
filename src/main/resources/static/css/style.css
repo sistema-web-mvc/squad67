@@ -1,0 +1,304 @@
+/* =====================================================================
+   IF Agora - estilo base
+   Pensado para acessibilidade: bom contraste, fonte em rem (respeita o
+   tamanho escolhido pelo usuário), foco visível, modo escuro automático
+   e respeito a "reduzir movimento".
+   ===================================================================== */
+
+:root {
+    --cor-fundo: #f6f8f5;
+    --cor-superficie: #ffffff;
+    --cor-texto: #1b2420;
+    --cor-texto-suave: #4a5651;
+    --cor-primaria: #1f6b3a;       /* verde IF */
+    --cor-primaria-escura: #14502a;
+    --cor-sobre-primaria: #ffffff;
+    --cor-borda: #d5ddd7;
+    --cor-foco: #0b57d0;
+    --cor-selo-fundo: #fff1c2;
+    --cor-selo-texto: #5c4300;
+    --raio: 12px;
+    --largura: 64rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --cor-fundo: #101713;
+        --cor-superficie: #18221c;
+        --cor-texto: #eef3ef;
+        --cor-texto-suave: #b3c0b8;
+        --cor-primaria: #5fc287;
+        --cor-primaria-escura: #46a86d;
+        --cor-sobre-primaria: #08170e;
+        --cor-borda: #2c3a31;
+        --cor-foco: #8ab4f8;
+        --cor-selo-fundo: #4a3a0a;
+        --cor-selo-texto: #ffe9a8;
+    }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 100%; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--cor-texto);
+    background: var(--cor-fundo);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main { flex: 1; }
+
+.container {
+    width: 100%;
+    max-width: var(--largura);
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+a { color: var(--cor-primaria-escura); }
+@media (prefers-color-scheme: dark) { a { color: var(--cor-primaria); } }
+
+/* Foco sempre visível para quem navega pelo teclado */
+a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--cor-foco);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Link "pular para o conteúdo": aparece só quando recebe foco */
+.pular-conteudo {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 10;
+    padding: 0.6rem 1rem;
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+    border-radius: 0 0 var(--raio) var(--raio);
+    font-weight: 600;
+}
+.pular-conteudo:focus { top: 0; }
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho {
+    background: var(--cor-superficie);
+    border-bottom: 1px solid var(--cor-borda);
+}
+.cabecalho__interno {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--cor-texto);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+.marca__icone {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.menu a {
+    display: inline-block;
+    padding: 0.5rem 0.9rem;      /* alvo de toque confortável */
+    min-height: 2.75rem;
+    line-height: 1.75rem;
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--cor-texto);
+}
+.menu a:hover { background: var(--cor-fundo); }
+.menu a[aria-current="page"] {
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+    font-weight: 600;
+}
+
+/* ---------- Início ---------- */
+.hero {
+    padding: 3rem 0 2.5rem;
+    background: var(--cor-superficie);
+    border-bottom: 1px solid var(--cor-borda);
+}
+.hero h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    line-height: 1.15;
+}
+.hero__texto {
+    margin: 0;
+    max-width: 40rem;
+    font-size: 1.125rem;
+    color: var(--cor-texto-suave);
+}
+
+.secao { padding-top: 2.5rem; padding-bottom: 3rem; }
+.secao h2 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+.secao__texto { margin: 0 0 1.5rem; color: var(--cor-texto-suave); }
+
+.cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+.card {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.card h3 { margin: 0; font-size: 1.125rem; }
+.card p { margin: 0; color: var(--cor-texto-suave); flex: 1; }
+
+.selo {
+    margin-top: 0.5rem;
+    padding: 0.15rem 0.65rem;
+    border-radius: 999px;
+    background: var(--cor-selo-fundo);
+    color: var(--cor-selo-texto);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* ---------- Rodapé ---------- */
+.rodape {
+    border-top: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+    padding: 1.25rem 0;
+    color: var(--cor-texto-suave);
+    font-size: 0.9375rem;
+}
+.rodape__interno {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+}
+/* O logo tem texto escuro: fundo branco fixo para ler também no modo escuro */
+.rodape__logo {
+    height: 3rem;
+    width: auto;
+    padding: 0.4rem 0.75rem;
+    background: #ffffff;
+    border-radius: 8px;
+}
+.rodape p { margin: 0.15rem 0; }
+.rodape__nota { font-size: 0.875rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Avisos (lista e detalhe) ---------- */
+.card__link { margin-top: 0.5rem; font-weight: 600; }
+
+.filtros {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.filtro {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    min-height: 2.5rem;
+    line-height: 1.7;
+    border: 1px solid var(--cor-borda);
+    border-radius: 999px;
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    text-decoration: none;
+}
+.filtro:hover { border-color: var(--cor-primaria); }
+.filtro--ativo {
+    background: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+    font-weight: 600;
+}
+
+.lista-avisos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+}
+.card__titulo { margin: 0; font-size: 1.25rem; }
+.card__titulo a { color: var(--cor-texto); text-decoration-thickness: 2px; }
+.card__titulo a:hover { color: var(--cor-primaria-escura); }
+@media (prefers-color-scheme: dark) { .card__titulo a:hover { color: var(--cor-primaria); } }
+.card__meta { margin: 0; font-size: 0.9375rem; color: var(--cor-texto-suave); }
+
+.selo--tipo {
+    margin-top: 0;
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+}
+
+.vazio {
+    padding: 1.5rem;
+    border: 1px dashed var(--cor-borda);
+    border-radius: var(--raio);
+    color: var(--cor-texto-suave);
+}
+
+.voltar { font-weight: 600; }
+
+.detalhe {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    padding: 1.5rem;
+}
+.detalhe h1 { margin: 0.5rem 0 0.75rem; font-size: clamp(1.5rem, 4vw, 2.25rem); line-height: 1.2; }
+.detalhe__selos { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.detalhe__selos .selo { margin-top: 0; }
+.detalhe__descricao { font-size: 1.125rem; margin: 0 0 1.5rem; }
+
+.dados {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.dados dt { font-size: 0.875rem; color: var(--cor-texto-suave); }
+.dados dd { margin: 0; font-weight: 600; }
