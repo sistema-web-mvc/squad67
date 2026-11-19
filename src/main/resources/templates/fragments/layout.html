@@ -2,56 +2,98 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
 <!--
-  Layout base do IF Agora. Cada página reaproveita estes pedaços:
+  Layout base do IF Agora (Bootstrap 5). Todas as páginas reaproveitam estes pedaços,
+  então mudar o menu ou o rodapé aqui muda o site inteiro:
+
     <head th:replace="~{fragments/layout :: head('Título da página')}"></head>
-    <header th:replace="~{fragments/layout :: cabecalho('inicio')}"></header>
-    <footer th:replace="~{fragments/layout :: rodape}"></footer>
+    <body class="d-flex flex-column min-vh-100">
+      <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+      <header th:replace="~{fragments/layout :: cabecalho('avisos')}"></header>
+      <div th:replace="~{fragments/layout :: mensagens}"></div>
+      <main id="conteudo" class="container py-4 flex-grow-1"> ...conteúdo da página... </main>
+      <footer th:replace="~{fragments/layout :: rodape}"></footer>
+      <script th:replace="~{fragments/layout :: scripts}"></script>
+    </body>
 -->
 
 <head th:fragment="head(titulo)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
     <title th:text="${titulo} + ' | IF Agora'">IF Agora</title>
+    <!-- Usa o tema claro ou escuro do aparelho -->
+    <script>
+        (function () {
+            try {
+                var escuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-bs-theme', escuro ? 'dark' : 'light');
+            } catch (e) { /* sem tema: fica claro */ }
+        })();
+    </script>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-<!-- ativo: nome da página atual, usado para marcar o item do menu -->
-<header class="cabecalho" th:fragment="cabecalho(ativo)">
-    <div class="container cabecalho__interno">
-        <a class="marca" th:href="@{/}" aria-label="IF Agora, página inicial">
-            <span class="marca__icone" aria-hidden="true">IF</span>
-            <span class="marca__nome">Agora</span>
-        </a>
+<!-- ativo: nome da página atual, usado para destacar o item do menu -->
+<header th:fragment="cabecalho(ativo)">
+    <nav class="navbar navbar-expand-md bg-body border-bottom" aria-label="Menu principal">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" th:href="@{/}"
+               aria-label="IF Agora, página inicial">
+                <span class="marca-icone" aria-hidden="true">IF</span>
+                <span>Agora</span>
+            </a>
 
-        <nav aria-label="Menu principal">
-            <ul class="menu">
-                <li>
-                    <a th:href="@{/}"
-                       th:attr="aria-current=${ativo == 'inicio'} ? 'page' : null">Início</a>
-                </li>
-                <li>
-                    <a th:href="@{/avisos}"
-                       th:attr="aria-current=${ativo == 'avisos'} ? 'page' : null">Avisos</a>
-                </li>
-                <!-- Novas páginas entram aqui, copiando o item acima e trocando 'avisos' pelo nome da página. -->
-            </ul>
-        </nav>
-    </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#menuPrincipal" aria-controls="menuPrincipal"
+                    aria-expanded="false" aria-label="Abrir ou fechar o menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menuPrincipal">
+                <ul class="navbar-nav ms-auto align-items-md-center">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}"
+                           th:classappend="${ativo == 'inicio'} ? 'active'"
+                           th:attr="aria-current=${ativo == 'inicio'} ? 'page' : null">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/avisos}"
+                           th:classappend="${ativo == 'avisos'} ? 'active'"
+                           th:attr="aria-current=${ativo == 'avisos'} ? 'page' : null">Avisos</a>
+                    </li>
+                    <li class="nav-item ms-md-2 mt-2 mt-md-0">
+                        <a class="btn btn-primary btn-sm" th:href="@{/avisos/novo}">Novo aviso</a>
+                    </li>
+                    <!-- Novas páginas entram aqui, copiando um <li> acima. -->
+                </ul>
+            </div>
+        </div>
+    </nav>
 </header>
 
-<footer class="rodape" th:fragment="rodape">
-    <div class="container rodape__interno">
-        <img class="rodape__logo" th:src="@{/img/logo-iftm-uberlandia-centro.png}"
+<!-- Mensagem de sucesso: vem do controller com flash.addFlashAttribute("mensagem", ...) -->
+<div th:fragment="mensagens" class="container mt-3">
+    <div class="alert alert-success alert-dismissible fade show mb-0" role="status"
+         th:if="${mensagem != null}">
+        <span th:text="${mensagem}">Operação realizada com sucesso.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+</div>
+
+<footer th:fragment="rodape" class="border-top bg-body-tertiary py-3">
+    <div class="container d-flex flex-wrap align-items-center gap-3">
+        <img class="rodape-logo" th:src="@{/img/logo-iftm-uberlandia-centro.png}"
              alt="Instituto Federal do Triângulo Mineiro, Campus Uberlândia Centro">
-        <div>
-            <p>IF Agora · projeto da equipe Squad 67 · IFTM</p>
-            <p class="rodape__nota">Projeto acadêmico. Ainda não é um canal oficial do instituto.</p>
+        <div class="small text-body-secondary">
+            <p class="mb-1">IF Agora · projeto da equipe Squad 67 · IFTM</p>
+            <p class="mb-0">Projeto acadêmico. Ainda não é um canal oficial do instituto.</p>
         </div>
     </div>
 </footer>
+
+<script th:fragment="scripts" th:src="@{/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 </html>

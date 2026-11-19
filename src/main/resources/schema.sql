@@ -160,7 +160,7 @@ CREATE TABLE notificacao (
     enviada_em  TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     lida        BOOLEAN    NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_notificacao_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id),
-    CONSTRAINT fk_notificacao_aviso   FOREIGN KEY (aviso_id)   REFERENCES aviso (id),
+    CONSTRAINT fk_notificacao_aviso   FOREIGN KEY (aviso_id)   REFERENCES aviso (id) ON DELETE CASCADE,
     CONSTRAINT uq_notificacao_usuario_aviso UNIQUE (usuario_id, aviso_id)
 );
 
@@ -172,7 +172,7 @@ CREATE TABLE confirmacao_aviso (
     aviso_id    BIGINT     NOT NULL,
     usuario_id  BIGINT     NOT NULL,
     criado_em   TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_confirmacao_aviso   FOREIGN KEY (aviso_id)   REFERENCES aviso (id),
+    CONSTRAINT fk_confirmacao_aviso   FOREIGN KEY (aviso_id)   REFERENCES aviso (id) ON DELETE CASCADE,
     CONSTRAINT fk_confirmacao_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id),
     CONSTRAINT uq_confirmacao_aviso_usuario UNIQUE (aviso_id, usuario_id)
 );
