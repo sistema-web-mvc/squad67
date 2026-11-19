@@ -2,23 +2,26 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <!-- O Spring Boot usa esta página sempre que a resposta for 404 (por exemplo, aviso que não existe). -->
 <head th:replace="~{fragments/layout :: head('Página não encontrada')}"></head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
 <header th:replace="~{fragments/layout :: cabecalho('')}"></header>
 
-<main id="conteudo" class="container secao">
-    <h1>Não encontramos essa página</h1>
-    <p class="secao__texto">O endereço pode estar errado, ou o aviso não existe mais.</p>
+<div th:replace="~{fragments/layout :: mensagens}"></div>
+
+<main id="conteudo" class="container py-5 flex-grow-1">
+    <h1 class="h2">Não encontramos essa página</h1>
+    <p class="text-body-secondary">O endereço pode estar errado, ou o aviso não existe mais.</p>
     <p>
-        <a class="voltar" th:href="@{/avisos}">&larr; Ver os avisos</a>
-        ·
-        <a class="voltar" th:href="@{/}">Ir para o início</a>
+        <a class="btn btn-primary" th:href="@{/avisos}">Ver os avisos</a>
+        <a class="btn btn-outline-secondary" th:href="@{/}">Ir para o início</a>
     </p>
 </main>
 
 <footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:replace="~{fragments/layout :: scripts}"></script>
 
 </body>
 </html>

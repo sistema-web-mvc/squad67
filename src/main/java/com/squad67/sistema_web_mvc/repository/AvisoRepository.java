@@ -1,14 +1,21 @@
 package com.squad67.sistema_web_mvc.repository;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.squad67.sistema_web_mvc.model.Aviso;
+import com.squad67.sistema_web_mvc.model.AvisoForm;
 import com.squad67.sistema_web_mvc.model.TipoAviso;
 
 /**
@@ -85,6 +92,87 @@ public class AvisoRepository {
 				MAPEADOR,
 				id);
 		return encontrados.stream().findFirst();
+	}
+
+	// ---------------------------------------------------------------
+	// Criar, editar e excluir
+	// ---------------------------------------------------------------
+
+	private static final String INSERIR = """
+			INSERT INTO aviso (campus_id, turma_id, autor_id, espaco_id, tipo, titulo, descricao, expira_em)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+			""";
+
+	private static final String ATUALIZAR = """
+			UPDATE aviso
+			   SET campus_id = ?, turma_id = ?, autor_id = ?, espaco_id = ?,
+			       tipo = ?, titulo = ?, descricao = ?, expira_em = ?
+			 WHERE id = ? AND ativo = TRUE
+			""";
+
+	private static final RowMapper<AvisoForm> MAPEADOR_FORM = (rs, linha) -> {
+		AvisoForm form = new AvisoForm();
+		form.setId(rs.getLong("id"));
+		form.setCampusId(rs.getLong("campus_id"));
+		form.setTurmaId(rs.getObject("turma_id", Long.class));
+		form.setAutorId(rs.getLong("autor_id"));
+		form.setEspacoId(rs.getObject("espaco_id", Long.class));
+		form.setTipo(TipoAviso.valueOf(rs.getString("tipo")));
+		form.setTitulo(rs.getString("titulo"));
+		form.setDescricao(rs.getString("descricao"));
+		form.setExpiraEm(rs.getObject("expira_em", LocalDateTime.class));
+		return form;
+	};
+
+	/** Os dados de um aviso do jeito que o formulário de edição precisa (ids dos selects). */
+	public Optional<AvisoForm> buscarFormPorId(Long id) {
+		List<AvisoForm> encontrados = jdbc.query("""
+				SELECT id, campus_id, turma_id, autor_id, espaco_id, tipo, titulo, descricao, expira_em
+				  FROM aviso
+				 WHERE id = ? AND ativo = TRUE
+				""", MAPEADOR_FORM, id);
+		return encontrados.stream().findFirst();
+	}
+
+	/** Insere o aviso e devolve o id gerado pelo banco. */
+	public Long inserir(AvisoForm form) {
+		KeyHolder chave = new GeneratedKeyHolder();
+		jdbc.update(conexao -> {
+			PreparedStatement ps = conexao.prepareStatement(INSERIR, new String[] { "id" });
+			preencherCampos(ps, form);
+			return ps;
+		}, chave);
+		return chave.getKey().longValue();
+	}
+
+	/** Atualiza o aviso. Devolve quantas linhas mudaram (0 = aviso não existe). */
+	public int atualizar(Long id, AvisoForm form) {
+		return jdbc.update(conexao -> {
+			PreparedStatement ps = conexao.prepareStatement(ATUALIZAR);
+			preencherCampos(ps, form);
+			ps.setLong(9, id);
+			return ps;
+		});
+	}
+
+	/**
+	 * Apaga o aviso. As confirmações e notificações dele são apagadas junto
+	 * (ON DELETE CASCADE no schema.sql). Devolve quantas linhas foram apagadas.
+	 */
+	public int excluir(Long id) {
+		return jdbc.update("DELETE FROM aviso WHERE id = ?", id);
+	}
+
+	/** Preenche os 8 primeiros "?" (os campos do formulário), na ordem do INSERT/UPDATE. */
+	private static void preencherCampos(PreparedStatement ps, AvisoForm form) throws SQLException {
+		ps.setLong(1, form.getCampusId());
+		ps.setObject(2, form.getTurmaId(), Types.BIGINT);
+		ps.setLong(3, form.getAutorId());
+		ps.setObject(4, form.getEspacoId(), Types.BIGINT);
+		ps.setString(5, form.getTipo().name());
+		ps.setString(6, form.getTitulo());
+		ps.setString(7, form.getDescricao());
+		ps.setTimestamp(8, form.getExpiraEm() == null ? null : Timestamp.valueOf(form.getExpiraEm()));
 	}
 
 }

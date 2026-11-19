@@ -1,48 +1,75 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Início')}"></head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
 <header th:replace="~{fragments/layout :: cabecalho('inicio')}"></header>
 
-<main id="conteudo">
+<div th:replace="~{fragments/layout :: mensagens}"></div>
 
-    <section class="hero">
+<main id="conteudo" class="flex-grow-1">
+
+    <section class="bg-body-tertiary border-bottom py-5">
         <div class="container">
-            <h1>O que está acontecendo no campus, agora.</h1>
-            <p class="hero__texto">
+            <h1 class="display-5 fw-bold">O que está acontecendo no campus, agora.</h1>
+            <p class="lead text-body-secondary mb-4">
                 Aula cancelada, sala trocada, fila do refeitório, elevador fora de uso.
                 Tudo em um só lugar, na hora, para a sua turma.
             </p>
+            <a class="btn btn-primary btn-lg" th:href="@{/avisos}">Ver os avisos</a>
         </div>
     </section>
 
-    <section class="container secao" aria-labelledby="titulo-recursos">
-        <h2 id="titulo-recursos">O que vem por aí</h2>
-        <p class="secao__texto">O app está em construção. Estes são os primeiros recursos planejados.</p>
+    <section class="container py-5" aria-labelledby="titulo-recursos">
+        <h2 id="titulo-recursos" class="h3">O que vem por aí</h2>
+        <p class="text-body-secondary mb-4">O app está em construção. Estes são os recursos planejados.</p>
 
-        <ul class="cards">
-            <li class="card">
-                <h3>Avisos da sua turma</h3>
-                <p>Aula cancelada ou sala trocada, direto do banco de dados.</p>
-                <a class="card__link" th:href="@{/avisos}">Ver os avisos</a>
+        <ul class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 list-unstyled">
+            <li class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <h3 class="h5 card-title">Avisos da sua turma</h3>
+                        <p class="card-text text-body-secondary flex-grow-1">
+                            Aula cancelada ou sala trocada: cadastre, edite e consulte.
+                        </p>
+                        <a class="btn btn-sm btn-primary" th:href="@{/avisos}">Abrir avisos</a>
+                    </div>
+                </div>
             </li>
-            <li class="card">
-                <h3>Próxima aula e sala</h3>
-                <p>Veja onde e quando é a sua próxima aula assim que abrir o app.</p>
-                <span class="selo">Em breve</span>
+            <li class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <h3 class="h5 card-title">Próxima aula e sala</h3>
+                        <p class="card-text text-body-secondary flex-grow-1">
+                            Veja onde e quando é a sua próxima aula assim que abrir o app.
+                        </p>
+                        <span class="badge text-bg-warning">Em breve</span>
+                    </div>
+                </div>
             </li>
-            <li class="card">
-                <h3>Refeitório</h3>
-                <p>Cardápio do dia e aviso de fila grande, enviado pelos próprios alunos.</p>
-                <span class="selo">Em breve</span>
+            <li class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <h3 class="h5 card-title">Refeitório</h3>
+                        <p class="card-text text-body-secondary flex-grow-1">
+                            Cardápio do dia e aviso de fila grande, enviado pelos próprios alunos.
+                        </p>
+                        <span class="badge text-bg-warning">Em breve</span>
+                    </div>
+                </div>
             </li>
-            <li class="card">
-                <h3>Alertas de acessibilidade</h3>
-                <p>Elevador quebrado ou rampa bloqueada, para ninguém perder tempo à toa.</p>
-                <span class="selo">Em breve</span>
+            <li class="col">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column align-items-start">
+                        <h3 class="h5 card-title">Alertas de acessibilidade</h3>
+                        <p class="card-text text-body-secondary flex-grow-1">
+                            Elevador quebrado ou rampa bloqueada, para ninguém perder tempo à toa.
+                        </p>
+                        <span class="badge text-bg-warning">Em breve</span>
+                    </div>
+                </div>
             </li>
         </ul>
     </section>
@@ -50,6 +77,8 @@
 </main>
 
 <footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:replace="~{fragments/layout :: scripts}"></script>
 
 </body>
 </html>

@@ -1,66 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${aviso.titulo()})}"></head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
 <header th:replace="~{fragments/layout :: cabecalho('avisos')}"></header>
 
-<main id="conteudo" class="container secao">
+<!-- Mostra "Aviso criado/atualizado com sucesso" depois do redirect -->
+<div th:replace="~{fragments/layout :: mensagens}"></div>
 
-    <p><a class="voltar" th:href="@{/avisos}">&larr; Voltar para os avisos</a></p>
+<main id="conteudo" class="container py-4 flex-grow-1">
 
-    <article class="detalhe">
-        <p class="detalhe__selos">
-            <span class="selo selo--tipo" th:text="${aviso.tipo().rotulo}">Tipo</span>
-            <span class="selo" th:if="${aviso.expirado()}">Expirado</span>
-        </p>
+    <p><a th:href="@{/avisos}">&larr; Voltar para os avisos</a></p>
 
-        <h1 th:text="${aviso.titulo()}">Título do aviso</h1>
+    <article class="card">
+        <div class="card-body p-4">
+            <p class="mb-2">
+                <span class="badge text-bg-primary" th:text="${aviso.tipo().rotulo}">Tipo</span>
+                <span class="badge text-bg-secondary" th:if="${aviso.expirado()}">Expirado</span>
+            </p>
 
-        <p class="detalhe__descricao" th:if="${aviso.descricao() != null}" th:text="${aviso.descricao()}">
-            Descrição do aviso.
-        </p>
-        <p class="detalhe__descricao" th:if="${aviso.descricao() == null}">
-            Este aviso não tem descrição.
-        </p>
+            <h1 class="h2" th:text="${aviso.titulo()}">Título do aviso</h1>
 
-        <dl class="dados">
-            <div>
-                <dt>Para</dt>
-                <dd th:text="${aviso.escopo()}">Turma</dd>
+            <p class="fs-5" th:if="${aviso.descricao() != null}" th:text="${aviso.descricao()}">
+                Descrição do aviso.
+            </p>
+            <p class="fs-5 text-body-secondary" th:if="${aviso.descricao() == null}">
+                Este aviso não tem descrição.
+            </p>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-3 text-body-secondary fw-normal">Para</dt>
+                <dd class="col-sm-9 fw-semibold" th:text="${aviso.escopo()}">Turma</dd>
+
+                <th:block th:if="${aviso.espaco() != null}">
+                    <dt class="col-sm-3 text-body-secondary fw-normal">Local</dt>
+                    <dd class="col-sm-9 fw-semibold" th:text="${aviso.espaco()}">Sala</dd>
+                </th:block>
+
+                <dt class="col-sm-3 text-body-secondary fw-normal">Campus</dt>
+                <dd class="col-sm-9 fw-semibold" th:text="${aviso.campus()}">Campus</dd>
+
+                <dt class="col-sm-3 text-body-secondary fw-normal">Publicado por</dt>
+                <dd class="col-sm-9 fw-semibold" th:text="${aviso.autor()}">Autor</dd>
+
+                <dt class="col-sm-3 text-body-secondary fw-normal">Publicado em</dt>
+                <dd class="col-sm-9 fw-semibold" th:text="${aviso.criadoEmFormatado()}">01/01/2026 08:00</dd>
+
+                <th:block th:if="${aviso.expiraEm() != null}">
+                    <dt class="col-sm-3 text-body-secondary fw-normal">Vale até</dt>
+                    <dd class="col-sm-9 fw-semibold" th:text="${aviso.expiraEmFormatado()}">01/01/2026 18:00</dd>
+                </th:block>
+
+                <dt class="col-sm-3 text-body-secondary fw-normal">Confirmações</dt>
+                <dd class="col-sm-9 fw-semibold" th:text="${aviso.confirmacoes()}">0</dd>
+            </dl>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" th:href="@{/avisos/{id}/editar(id=${aviso.id()})}">Editar</a>
+                <button type="button" class="btn btn-outline-danger"
+                        data-bs-toggle="modal" data-bs-target="#modalExcluir">Excluir</button>
             </div>
-            <div th:if="${aviso.espaco() != null}">
-                <dt>Local</dt>
-                <dd th:text="${aviso.espaco()}">Sala</dd>
-            </div>
-            <div>
-                <dt>Campus</dt>
-                <dd th:text="${aviso.campus()}">Campus</dd>
-            </div>
-            <div>
-                <dt>Publicado por</dt>
-                <dd th:text="${aviso.autor()}">Autor</dd>
-            </div>
-            <div>
-                <dt>Publicado em</dt>
-                <dd th:text="${aviso.criadoEmFormatado()}">01/01/2026 08:00</dd>
-            </div>
-            <div th:if="${aviso.expiraEm() != null}">
-                <dt>Vale até</dt>
-                <dd th:text="${aviso.expiraEmFormatado()}">01/01/2026 18:00</dd>
-            </div>
-            <div>
-                <dt>Confirmações</dt>
-                <dd th:text="${aviso.confirmacoes()}">0</dd>
-            </div>
-        </dl>
+        </div>
     </article>
+
+    <!-- Confirmação de exclusão: o aviso só é apagado se a pessoa clicar em "Sim, excluir" (POST) -->
+    <div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="tituloModalExcluir" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="tituloModalExcluir">Excluir este aviso?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1">Você vai excluir:</p>
+                    <p class="fw-semibold mb-2" th:text="${aviso.titulo()}">Título do aviso</p>
+                    <p class="text-body-secondary mb-0">
+                        As confirmações e notificações deste aviso também serão apagadas.
+                        Essa ação não pode ser desfeita.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form th:action="@{/avisos/{id}/excluir(id=${aviso.id()})}" method="post">
+                        <button type="submit" class="btn btn-danger">Sim, excluir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main>
 
 <footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:replace="~{fragments/layout :: scripts}"></script>
 
 </body>
 </html>

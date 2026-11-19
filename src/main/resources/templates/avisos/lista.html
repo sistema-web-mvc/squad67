@@ -1,61 +1,79 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Avisos')}"></head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
 <header th:replace="~{fragments/layout :: cabecalho('avisos')}"></header>
 
-<main id="conteudo" class="container secao">
+<div th:replace="~{fragments/layout :: mensagens}"></div>
 
-    <h1>Avisos</h1>
-    <p class="secao__texto">Só aparecem os avisos que ainda estão valendo, do mais novo para o mais antigo.</p>
+<main id="conteudo" class="container py-4 flex-grow-1">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+            <h1 class="h2 mb-1">Avisos</h1>
+            <p class="text-body-secondary mb-0">
+                Só os avisos que ainda estão valendo, do mais novo para o mais antigo.
+            </p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/avisos/novo}">Novo aviso</a>
+    </div>
 
     <!-- Filtro por tipo: cada link recarrega a página com ?tipo=... -->
-    <nav aria-label="Filtrar avisos por tipo">
-        <ul class="filtros">
-            <li>
-                <a class="filtro" th:href="@{/avisos}"
-                   th:classappend="${tipoSelecionado == null} ? 'filtro--ativo'"
+    <nav aria-label="Filtrar avisos por tipo" class="mb-4">
+        <ul class="nav nav-pills gap-1">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/avisos}"
+                   th:classappend="${tipoSelecionado == null} ? 'active'"
                    th:attr="aria-current=${tipoSelecionado == null} ? 'true' : null">Todos</a>
             </li>
-            <li th:each="t : ${tipos}">
-                <a class="filtro" th:href="@{/avisos(tipo=${t.name()})}"
-                   th:classappend="${tipoSelecionado == t} ? 'filtro--ativo'"
+            <li class="nav-item" th:each="t : ${tipos}">
+                <a class="nav-link" th:href="@{/avisos(tipo=${t.name()})}"
+                   th:classappend="${tipoSelecionado == t} ? 'active'"
                    th:attr="aria-current=${tipoSelecionado == t} ? 'true' : null"
                    th:text="${t.rotulo}">Tipo</a>
             </li>
         </ul>
     </nav>
 
-    <p class="vazio" th:if="${#lists.isEmpty(avisos)}">
+    <p class="border border-2 border-dashed rounded p-4 text-body-secondary"
+       th:if="${#lists.isEmpty(avisos)}">
         Nenhum aviso valendo agora para este filtro.
     </p>
 
-    <ul class="lista-avisos" th:unless="${#lists.isEmpty(avisos)}">
+    <ul class="list-unstyled d-grid gap-3" th:unless="${#lists.isEmpty(avisos)}">
         <li class="card" th:each="aviso : ${avisos}">
-            <span class="selo selo--tipo" th:text="${aviso.tipo().rotulo}">Tipo</span>
-            <h2 class="card__titulo">
-                <a th:href="@{/avisos/{id}(id=${aviso.id()})}" th:text="${aviso.titulo()}">Título do aviso</a>
-            </h2>
-            <p class="card__meta">
-                <span th:text="${aviso.escopo()}">Turma</span>
-                <span th:if="${aviso.espaco() != null}">
-                    · <span th:text="${aviso.espaco()}">Sala</span>
-                </span>
-                · <span th:text="${aviso.criadoEmFormatado()}">01/01/2026 08:00</span>
-            </p>
-            <p class="card__meta" th:if="${aviso.confirmacoes() > 0}"
-               th:text="${aviso.confirmacoes() == 1 ? '1 pessoa confirmou' : aviso.confirmacoes() + ' pessoas confirmaram'}">
-                2 pessoas confirmaram
-            </p>
+            <div class="card-body">
+                <span class="badge text-bg-primary mb-2" th:text="${aviso.tipo().rotulo}">Tipo</span>
+                <h2 class="h5 card-title">
+                    <a class="link-body-emphasis" th:href="@{/avisos/{id}(id=${aviso.id()})}"
+                       th:text="${aviso.titulo()}">Título do aviso</a>
+                </h2>
+                <p class="card-text text-body-secondary small mb-2">
+                    <span th:text="${aviso.escopo()}">Turma</span>
+                    <span th:if="${aviso.espaco() != null}">
+                        · <span th:text="${aviso.espaco()}">Sala</span>
+                    </span>
+                    · <span th:text="${aviso.criadoEmFormatado()}">01/01/2026 08:00</span>
+                    <span th:if="${aviso.confirmacoes() > 0}"
+                          th:text="${aviso.confirmacoes() == 1 ? ' · 1 pessoa confirmou' : ' · ' + aviso.confirmacoes() + ' pessoas confirmaram'}">
+                        · 2 pessoas confirmaram
+                    </span>
+                </p>
+                <a class="btn btn-sm btn-outline-secondary"
+                   th:href="@{/avisos/{id}/editar(id=${aviso.id()})}"
+                   th:attr="aria-label=${'Editar o aviso ' + aviso.titulo()}">Editar</a>
+            </div>
         </li>
     </ul>
 
 </main>
 
 <footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:replace="~{fragments/layout :: scripts}"></script>
 
 </body>
 </html>
