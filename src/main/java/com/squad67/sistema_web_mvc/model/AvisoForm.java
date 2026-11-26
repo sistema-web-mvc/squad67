@@ -2,6 +2,11 @@ package com.squad67.sistema_web_mvc.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -15,17 +20,29 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class AvisoForm {
 
+	@Positive(message = "O identificador do aviso deve ser positivo.")
 	private Long id; // null = aviso novo
+	@NotNull(message = "Escolha o tipo do aviso.")
 	private TipoAviso tipo;
+	@NotBlank(message = "Informe o título.")
+	@Size(max = 150, message = "O título pode ter no máximo 150 caracteres.")
 	private String titulo;
+	@Size(max = 1000, message = "A descrição pode ter no máximo 1000 caracteres.")
 	private String descricao;
+	@NotNull(message = "Escolha o campus.")
+	@Positive(message = "Escolha um campus válido.")
 	private Long campusId;
+	@Positive(message = "Escolha uma turma válida.")
 	private Long turmaId;
+	@Positive(message = "Escolha um local válido.")
 	private Long espacoId;
+	@NotNull(message = "Escolha quem está publicando.")
+	@Positive(message = "Escolha uma pessoa válida.")
 	private Long autorId;
 
 	// <input type="datetime-local"> envia no formato 2026-11-25T18:30
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@Future(message = "A validade precisa ser uma data futura.")
 	private LocalDateTime expiraEm;
 
 	public AvisoForm() {

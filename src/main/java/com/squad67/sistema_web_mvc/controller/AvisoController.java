@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.validation.Valid;
 
 import com.squad67.sistema_web_mvc.exception.RegraDeNegocioException;
 import com.squad67.sistema_web_mvc.model.AvisoForm;
 import com.squad67.sistema_web_mvc.model.TipoAviso;
 import com.squad67.sistema_web_mvc.service.AvisoService;
-import com.squad67.sistema_web_mvc.validator.AvisoFormValidator;
 
 /**
  * Camada web: recebe a requisição, chama o service, coloca o resultado no
@@ -35,11 +35,9 @@ import com.squad67.sistema_web_mvc.validator.AvisoFormValidator;
 public class AvisoController {
 
 	private final AvisoService service;
-	private final AvisoFormValidator validator;
 
-	public AvisoController(AvisoService service, AvisoFormValidator validator) {
+	public AvisoController(AvisoService service) {
 		this.service = service;
-		this.validator = validator;
 	}
 
 	// O id nunca vem do formulário: vem da URL (evita editar outro aviso por engano).
@@ -55,10 +53,18 @@ public class AvisoController {
 	// GET /avisos  ou  GET /avisos?tipo=SALA_TROCADA
 	// Um valor de tipo que não existe faz o Spring responder 400 sozinho.
 	@GetMapping
-	public String listar(@RequestParam(name = "tipo", required = false) TipoAviso tipo, Model model) {
-		model.addAttribute("avisos", service.listarVigentes(tipo));
+	public String listar(@RequestParam(name = "tipo", required = false) TipoAviso tipo,
+			@RequestParam(name = "q", required = false) String busca,
+			@RequestParam(name = "ordem", defaultValue = "recentes") String ordem, Model model) {
+		ordem = switch (ordem) {
+			case "titulo", "expiracao" -> ordem;
+			default -> "recentes";
+		};
+		model.addAttribute("avisos", service.listarVigentes(tipo, busca, ordem));
 		model.addAttribute("tipos", TipoAviso.values());
 		model.addAttribute("tipoSelecionado", tipo);
+		model.addAttribute("termoBusca", busca == null ? "" : busca.trim());
+		model.addAttribute("ordemSelecionada", ordem);
 		return "avisos/lista";
 	}
 
@@ -83,9 +89,8 @@ public class AvisoController {
 
 	// POST /avisos
 	@PostMapping
-	public String criar(@ModelAttribute("avisoForm") AvisoForm form, BindingResult resultado,
+	public String criar(@Valid @ModelAttribute("avisoForm") AvisoForm form, BindingResult resultado,
 			Model model, RedirectAttributes flash) {
-		validator.validate(form, resultado);
 		if (!resultado.hasErrors()) {
 			try {
 				Long id = service.criar(form);
@@ -113,10 +118,9 @@ public class AvisoController {
 
 	// POST /avisos/3/editar
 	@PostMapping("/{id}/editar")
-	public String atualizar(@PathVariable("id") Long id, @ModelAttribute("avisoForm") AvisoForm form,
+	public String atualizar(@PathVariable("id") Long id, @Valid @ModelAttribute("avisoForm") AvisoForm form,
 			BindingResult resultado, Model model, RedirectAttributes flash) {
 		form.setId(id);
-		validator.validate(form, resultado);
 		if (!resultado.hasErrors()) {
 			try {
 				service.atualizar(id, form);

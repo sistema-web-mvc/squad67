@@ -15,22 +15,41 @@
         <div>
             <h1 class="h2 mb-1">Avisos</h1>
             <p class="text-body-secondary mb-0">
-                Só os avisos que ainda estão valendo, do mais novo para o mais antigo.
+                Avisos que ainda estão valendo.
             </p>
         </div>
         <a class="btn btn-primary" th:href="@{/avisos/novo}">Novo aviso</a>
     </div>
 
-    <!-- Filtro por tipo: cada link recarrega a página com ?tipo=... -->
+    <form class="row g-2 align-items-end mb-3" method="get" th:action="@{/avisos}">
+        <input th:if="${tipoSelecionado != null}" type="hidden" name="tipo" th:value="${tipoSelecionado.name()}">
+        <div class="col-md-6">
+            <label for="q" class="form-label">Buscar por título ou descrição</label>
+            <input id="q" name="q" type="search" class="form-control" maxlength="150" th:value="${termoBusca}">
+        </div>
+        <div class="col-md-4">
+            <label for="ordem" class="form-label">Ordenar por</label>
+            <select id="ordem" name="ordem" class="form-select">
+                <option value="recentes" th:selected="${ordemSelecionada == 'recentes'}">Mais recentes</option>
+                <option value="titulo" th:selected="${ordemSelecionada == 'titulo'}">Título</option>
+                <option value="expiracao" th:selected="${ordemSelecionada == 'expiracao'}">Data de expiração</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </div>
+    </form>
+
+    <!-- Filtro por tipo: cada link recarrega a página com os filtros atuais. -->
     <nav aria-label="Filtrar avisos por tipo" class="mb-4">
         <ul class="nav nav-pills gap-1">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/avisos}"
+                <a class="nav-link" th:href="@{/avisos(q=${termoBusca}, ordem=${ordemSelecionada})}"
                    th:classappend="${tipoSelecionado == null} ? 'active'"
                    th:attr="aria-current=${tipoSelecionado == null} ? 'true' : null">Todos</a>
             </li>
             <li class="nav-item" th:each="t : ${tipos}">
-                <a class="nav-link" th:href="@{/avisos(tipo=${t.name()})}"
+                <a class="nav-link" th:href="@{/avisos(tipo=${t.name()}, q=${termoBusca}, ordem=${ordemSelecionada})}"
                    th:classappend="${tipoSelecionado == t} ? 'active'"
                    th:attr="aria-current=${tipoSelecionado == t} ? 'true' : null"
                    th:text="${t.rotulo}">Tipo</a>
