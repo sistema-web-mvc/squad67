@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -72,14 +74,46 @@ public class AvisoRepository {
 	 *
 	 * @param tipo filtra por tipo; null traz todos os tipos
 	 */
-	public List<Aviso> listarVigentes(TipoAviso tipo) {
-		if (tipo == null) {
-			return jdbc.query(SELECT_AVISO + VIGENTE + MAIS_RECENTES_PRIMEIRO, MAPEADOR);
+	public List<Aviso> listarVigentes(TipoAviso tipo, String busca, String ordem) {
+		StringBuilder sql = new StringBuilder(SELECT_AVISO).append(VIGENTE);
+		List<Object> parametros = new ArrayList<>();
+		if (tipo != null) {
+			sql.append(" AND a.tipo = ?");
+			parametros.add(tipo.name());
 		}
-		return jdbc.query(
-				SELECT_AVISO + VIGENTE + " AND a.tipo = ?" + MAIS_RECENTES_PRIMEIRO,
-				MAPEADOR,
-				tipo.name());
+		if (busca != null && !busca.isBlank()) {
+			String termo = "%" + busca.trim().toLowerCase(Locale.ROOT) + "%";
+			sql.append(" AND (LOWER(a.titulo) LIKE ? OR LOWER(COALESCE(a.descricao, '')) LIKE ?)");
+			parametros.add(termo);
+			parametros.add(termo);
+		}
+		sql.append(ordenacao(ordem));
+		return jdbc.query(sql.toString(), MAPEADOR, parametros.toArray());
+	}
+
+	/** Verifica duplicidade entre avisos vigentes, ignorando o registro editado. */
+	public boolean existeDuplicadoVigente(String titulo, Long campusId, TipoAviso tipo, Long ignorarId) {
+		StringBuilder sql = new StringBuilder("""
+				SELECT COUNT(*)
+				  FROM aviso
+				 WHERE ativo = TRUE AND campus_id = ? AND tipo = ?
+				   AND LOWER(titulo) = LOWER(?)
+				   AND (expira_em IS NULL OR expira_em > CURRENT_TIMESTAMP)
+				""");
+		List<Object> parametros = new ArrayList<>(List.of(campusId, tipo.name(), titulo));
+		if (ignorarId != null) {
+			sql.append(" AND id <> ?");
+			parametros.add(ignorarId);
+		}
+		return jdbc.queryForObject(sql.toString(), Integer.class, parametros.toArray()) > 0;
+	}
+
+	private String ordenacao(String ordem) {
+		return switch (ordem == null ? "" : ordem) {
+			case "titulo" -> " ORDER BY LOWER(a.titulo) ASC, a.id DESC";
+			case "expiracao" -> " ORDER BY a.expira_em ASC NULLS LAST, a.id DESC";
+			default -> MAIS_RECENTES_PRIMEIRO;
+		};
 	}
 
 	/**

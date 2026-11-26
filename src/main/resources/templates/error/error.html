@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ocorreu um erro')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<header th:replace="~{fragments/layout :: cabecalho('')}"></header>
+
+<main id="conteudo" class="container py-5 flex-grow-1">
+    <h1 class="h2">Não foi possível concluir a solicitação</h1>
+    <p class="text-body-secondary" th:text="${mensagemErro}">Ocorreu um erro inesperado.</p>
+    <p>
+        <a class="btn btn-primary" th:href="@{/avisos}">Voltar aos avisos</a>
+        <a class="btn btn-outline-secondary" th:href="@{/}">Ir para o início</a>
+    </p>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:replace="~{fragments/layout :: scripts}"></script>
+
+</body>
+</html>

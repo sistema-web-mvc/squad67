@@ -1,6 +1,7 @@
 package com.squad67.sistema_web_mvc.service;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,8 @@ public class AvisoService {
 	// ---------------------------------------------------------------
 
 	/** Avisos que ainda estão valendo; tipo null traz todos. */
-	public List<Aviso> listarVigentes(TipoAviso tipo) {
-		return repository.listarVigentes(tipo);
+	public List<Aviso> listarVigentes(TipoAviso tipo, String busca, String ordem) {
+		return repository.listarVigentes(tipo, busca, ordem);
 	}
 
 	/** Detalhe de um aviso; lança 404 se não existir. */
@@ -53,13 +54,13 @@ public class AvisoService {
 
 	/** Cria o aviso e devolve o id gerado. Lança RegraDeNegocioException se os dados forem incoerentes. */
 	public Long criar(AvisoForm form) {
-		prepararEValidar(form);
+		prepararEValidar(form, null);
 		return repository.inserir(form);
 	}
 
 	/** Atualiza o aviso. Lança 404 se ele não existir. */
 	public void atualizar(Long id, AvisoForm form) {
-		prepararEValidar(form);
+		prepararEValidar(form, id);
 		if (repository.atualizar(id, form) == 0) {
 			throw naoEncontrado(id);
 		}
@@ -97,10 +98,13 @@ public class AvisoService {
 	// ---------------------------------------------------------------
 
 	/** Limpa os textos e confere as regras que dependem do banco. */
-	private void prepararEValidar(AvisoForm form) {
+	private void prepararEValidar(AvisoForm form, Long ignorarId) {
 		form.setTitulo(form.getTitulo().trim());
 		String descricao = form.getDescricao();
 		form.setDescricao(descricao == null || descricao.isBlank() ? null : descricao.trim());
+		if (form.getExpiraEm() != null && !form.getExpiraEm().isAfter(LocalDateTime.now())) {
+			throw new RegraDeNegocioException("expiraEm", "A validade precisa ser uma data futura.");
+		}
 
 		if (!referencias.existeCampus(form.getCampusId())) {
 			throw new RegraDeNegocioException("campusId", "Esse campus não existe.");
@@ -113,6 +117,9 @@ public class AvisoService {
 		}
 		if (form.getEspacoId() != null && !referencias.espacoPertenceAoCampus(form.getEspacoId(), form.getCampusId())) {
 			throw new RegraDeNegocioException("espacoId", "Esse local não pertence ao campus escolhido.");
+		}
+		if (repository.existeDuplicadoVigente(form.getTitulo(), form.getCampusId(), form.getTipo(), ignorarId)) {
+			throw new RegraDeNegocioException("titulo", "Já existe um aviso vigente com esse título, campus e tipo.");
 		}
 	}
 
